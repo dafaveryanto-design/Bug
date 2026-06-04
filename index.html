@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Peringatan Sistem</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000;
+            color: #ff0000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+            padding: 20px;
+            cursor: pointer;
+        }
+        .container {
+            background-color: #111;
+            padding: 40px 25px;
+            border-radius: 15px;
+            border: 4px solid #ff0000;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+        }
+        h1 { font-size: 34px; margin-bottom: 15px; letter-spacing: 1px; animation: flash 0.4s infinite; }
+        p { color: #fff; margin: 12px 0; font-size: 20px; line-height: 1.4; }
+        .warning { color: #ff0000; font-weight: bold; font-size: 22px; margin-top: 15px; margin-bottom: 30px; }
+        input {
+            width: 100%; padding: 16px; margin-bottom: 20px;
+            background: #222; border: 2px solid #ff0000; color: #fff;
+            text-align: center; font-size: 20px; border-radius: 8px; outline: none;
+        }
+        button {
+            width: 100%; padding: 18px; background: #ff0000; color: #fff;
+            border: none; cursor: pointer; font-weight: bold; font-size: 20px; border-radius: 8px;
+        }
+        .hidden { display: none; }
+        @keyframes flash { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body onclick="mainkanSuara()">
+
+    <!-- Memanggil file audio WA milikmu -->
+    <audio id="suaraPrank" src="AUD-20260531-WA0095.mp3" loop></audio>
+
+    <!-- Halaman 1 -->
+    <div id="page1" class="container">
+        <h1>AWOAKWOK MAMPUS</h1>
+        <p>Akun anda telah di awasi</p>
+        <p class="warning">Kalau anda keluar<br>Akun anda akan saya retas</p>
+        <input type="text" id="kode" placeholder="Masukkan kode">
+        <button onclick="pindahHalaman(event)">PROSES</button>
+    </div>
+
+    <!-- Halaman 2 -->
+    <div id="page2" class="container hidden" style="border-color: #00ff00; box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);">
+        <h1 style="color: #00ff00; animation: none;">SELAMAT!</h1>
+        <p style="font-size: 24px; font-weight: bold;">Anda kena prank wkwkwk 🤪</p>
+    </div>
+
+    <script>
+        var audio = document.getElementById('suaraPrank');
+        var sudahBunyi = false;
+
+        function mainkanSuara() {
+            if (!sudahBunyi) {
+                audio.volume = 1.0; 
+                audio.play().catch(function(error) {
+                    console.log("Menunggu ketukan layar...");
+                });
+                sudahBunyi = true;
+            }
+        }
+
+        function pindahHalaman(event) {
+            event.stopPropagation(); 
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
